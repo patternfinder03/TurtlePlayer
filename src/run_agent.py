@@ -18,15 +18,14 @@ def get_agent_class(agent_name, env):
     
     if agent_name == 'BaseAgent':
         return BaseAgent(env)
-    elif agent_name == 'DQNInterval':
+    elif agent_name == 'DQNAgent':
         return DQNAgentInveral(**agent_params)
     else:
         raise ValueError(f"Agent '{agent_name}' not recognized")
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Run Turtle Trading Strategy with specified agent and parameters.')
-    parser.add_argument('--agent', type=str, default='BaseAgent', help='Specify the agent to use.')
-    parser.add_argument('--all_stocks', action='store_true', default=False,help='Process all stocks if this flag is set.')
+    parser.add_argument('--agent', type=str, default='BaseAgent', help='Specify the agent to use. [BaseAgent, DQNAgent]')
     parser.add_argument('--render', action='store_true', default=False,help='Render the environment if this flag is set.')
     return parser.parse_args()
 

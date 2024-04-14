@@ -11,16 +11,14 @@ from .trade import Trade
 matplotlib.use('TkAgg') # Hack; MATPLOTLIB not showing without thanks GPT!
 import matplotlib.pyplot as plt
 from datetime import datetime
+from pathlib import Path
 
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-config_path = os.path.join(parent_dir, './turtlePlayer/config.py') # Ignore these lines my project structure is different
-config_path_2 = os.path.join(parent_dir, 'config.py') # Ignore these lines my project structure is different
+current_working_dir = Path.cwd()
 
-base_log_dir = os.path.join(parent_dir, './turtlePlayer/logs')
-base_log_dir_2 = os.path.join(parent_dir, 'logs')
+# Construct paths relative to the current working directory
+base_log_dir = current_working_dir / 'logs'
+config_dir = current_working_dir / 'config.py'
 
-config_dir = os.path.join(parent_dir, './turtlePlayer/config.py')
-config_dir_2 = os.path.join(parent_dir, 'config.py')
 
 
 def log_config_file(session_log_dir):
@@ -29,10 +27,8 @@ def log_config_file(session_log_dir):
     """
     if os.path.exists(config_dir):
         config_file_path = config_dir
-    elif os.path.exists(config_dir_2):
-        config_file_path = config_dir_2
     else:
-        print(f"Config file not found in {config_dir} or {config_dir_2}.")
+        print(f"Config file not found in {config_dir}")
         return
 
     # Define the path for the new log file within the session's log directory
@@ -54,8 +50,7 @@ def get_session_log_directory(last_episode):
     using an incremental integer as the directory name, and returns its path.
     """
     # Update the directory path to go two levels up from the current file's directory
-    current_file_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-    log_dir_base = os.path.join(current_file_dir, 'turtlePlayer', 'logs')
+    log_dir_base = base_log_dir
     index_file_path = os.path.join(log_dir_base, 'index.txt')
 
     # Check if the index file exists and read the current index
@@ -86,14 +81,11 @@ def get_log_file_path(session_number, file_name):
     :param file_name: The name of the log file to look for.
     :return: The path to the log file if found, else None.
     """
-    global base_log_dir, base_log_dir_2
+    global base_log_dir
     primary_path = os.path.join(base_log_dir, str(session_number), file_name)
-    secondary_path = os.path.join(base_log_dir_2, str(session_number), file_name)
 
     if os.path.exists(primary_path):
         return primary_path
-    elif os.path.exists(secondary_path):
-        return secondary_path
     else:
         print(f"Log file {file_name} not found in either directory for session {session_number}.")
         return None
@@ -453,8 +445,10 @@ def plot_trading_log(session_number, episode_nums, start_date=None, end_date=Non
 
     all_stats = []
     global_min, global_max = float('inf'), float('-inf')
+    to_plot = True
 
     if episode_nums == 'All':
+        to_plot = False
         episode_files = [file for file in os.listdir(directory_path) if file.startswith("trading_log_") and file.endswith(".csv")]
         episode_nums = [file_name.split('_')[-1].split('.')[0] for file_name in episode_files]
     else:
@@ -507,7 +501,8 @@ def plot_trading_log(session_number, episode_nums, start_date=None, end_date=Non
         merged_stats = pd.merge(pnl_stats, pnl_percent_stats, on='index', suffixes=('_PnL', '_PnL_percent'))
         all_stats.append((episode_num, merged_stats))
 
-    if episode_nums != 'All':
+    print(episode_nums)
+    if episode_nums != 'All' and to_plot:
         plt.tight_layout()
         plt.show()
 
@@ -781,6 +776,9 @@ def find_zero_exploration_intervals_comparison(base_session_number, session_numb
             [f for f in os.listdir(base_directory_path) if f.startswith("state_history_log_ep_") and f.endswith(".csv")],
             key=lambda x: int(x.split('_')[4].split('.')[0])
         )
+        
+        if len(base_file_names) != 1:
+            raise ValueError("For the first session please use a BaseAgent with only one episode.")
 
         for base_file_name in base_file_names:
             base_file_path = os.path.join(base_directory_path, base_file_name)

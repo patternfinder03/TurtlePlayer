@@ -1,7 +1,6 @@
 # Turtle environment for OpenAI Gymnasium
 
 # State Spaces:
-#   Basic: Previous Prices ranked [1, 2, ... X]
 #   Basic w/ scale: Previous Prices Ranked, then scaled betweeen [0, 1]
 
 # Action Spaces:
@@ -10,7 +9,7 @@
 #   2: Do nothing, keep the current look-back period
 
 # Reward Spaces:
-#   FinalOnly: Reward is only given at the end of the episode
+#   Interval: Rewards are calculated every time a trade is exited
 
 # Notes:
 # Initial Look-back Period is 20 as per the Turtle Trading Strategy
