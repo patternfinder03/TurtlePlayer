@@ -84,7 +84,7 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 
 # Actual results
 
-## Performance results(Comparing Base turtle and TurtlePlayer when exploration rate == 0)
+## Performance result tables(comparing Base turtle and TurtlePlayer when exploration rate == 0) and graphs(graphs contain full time period)
 
 
 ### F Performance Results
@@ -100,6 +100,7 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 | DQN_Average | 2014-02-24   | 2015-02-20 | -0.23%        |    28.71 |
 | DQN_Average | 2018-03-06   | 2019-03-05 | -0.37%        |    28.84 |
 
+![Alt text](/src/analysis_results/state_graphs/F_ep_1_vs_96_72.png)
 
 ### MSFT Performance Results
 
@@ -114,6 +115,7 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 | DQN_Average | 2014-02-21   | 2015-02-19 | 1.41%         |    30.32 |
 | DQN_Average | 2018-03-08   | 2019-03-07 | -0.38%        |    29.6  |
 
+![Alt text](/src/analysis_results/state_graphs/MSFT_ep_1_vs_14_38.png)
 
 ### COKE Performance Results
 
@@ -128,6 +130,7 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 | DQN_Average | 2014-02-24   | 2015-02-20 | 0.47%         |    31.39 |
 | DQN_Average | 2018-03-09   | 2019-03-08 | 0.33%         |    30.81 |
 
+![Alt text](/src/analysis_results/state_graphs/COKE_ep_1_vs_10_84.png)
 
 ### CVX Performance Results
 
@@ -142,6 +145,7 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 | DQN_Average | 2014-02-24   | 2015-02-20 | -0.09%        |    30.64 |
 | DQN_Average | 2018-03-09   | 2019-03-08 | -0.10%        |    30.19 |
 
+![Alt text](/src/analysis_results/state_graphs/F_ep_1_vs_96_72.png)
 
 ### AMZN Performance Results
 
@@ -156,6 +160,7 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 | DQN_Average | 2014-02-24   | 2015-02-20 | -0.10%        |    29.33 |
 | DQN_Average | 2018-03-09   | 2019-03-08 | -0.10%        |    30.01 |
 
+![Alt text](/src/analysis_results/state_graphs/AMZN_ep_1_vs_19_68.png)
 
 ### GOOG Performance Results
 
@@ -170,6 +175,7 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 | DQN_Average | 2015-10-08   | 2016-10-05 | -0.01%        |    30.23 |
 | DQN_Average | 2019-10-24   | 2020-10-21 | 0.00%         |    29.56 |
 
+![Alt text](/src/analysis_results/state_graphs/GOOG_ep_1_vs_16_95.png)
 
 ### M Performance Results
 
@@ -182,7 +188,7 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 | DQN_Average | 2014-07-07   | 2015-07-02 | -0.65%        |    30.46 |
 | DQN_Average | 2018-07-20   | 2019-07-19 | -0.95%        |    30.26 |
 
-
+![Alt text](/src/analysis_results/state_graphs/M_ep_1_vs_77_21.png)
 
 ### NFLX Performance Results
 
@@ -197,6 +203,7 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 | DQN_Average | 2014-02-24   | 2015-02-20 | 0.29%         |    29.09 |
 | DQN_Average | 2018-03-09   | 2019-03-08 | -0.43%        |    28.28 |
 
+![Alt text](/src/analysis_results/state_graphs/NFLX_ep_1_vs_83_85.png)
 
 ### NVDA Performance Results
 
@@ -211,6 +218,7 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 | DQN_Average | 2014-02-24   | 2015-02-20 | -1.41%        |    28.97 |
 | DQN_Average | 2018-03-09   | 2019-03-08 | -0.17%        |    27.91 |
 
+![Alt text](/src/analysis_results/state_graphs/NVDA_ep_1_vs_86_84.png)
 
 ### TGT Performance Results
 
@@ -225,6 +233,7 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 | DQN_Average | 2014-02-24   | 2015-02-20 | -0.01%        |    28.66 |
 | DQN_Average | 2018-03-09   | 2019-03-08 | 0.43%         |    29.54 |
 
+![Alt text](/src/analysis_results/state_graphs/TGT_ep_1_vs_10_50.png)
 
 ## Full time period results(Includes all time steps even when exploration rate > 0)
 
