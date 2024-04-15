@@ -578,7 +578,7 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
     - end_date: The end date to filter the data.
     """
     metrics = ['Price', 'Account Total Equity']
-    colors = ['blue', 'red']
+    colors = ['blue', 'red', 'green', 'yellow', 'orange']
 
     # Adjust the figure size and the subplot layout
     fig, axs = plt.subplots(len(metrics) + 3, 1, figsize=(12, 10))  # Total height increased
@@ -598,6 +598,8 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
         
     if len(episode_nums1) + len(episode_nums2) > 5:
         raise ValueError("Too many episodes to plot. Please limit to 5 or fewer episodes. If not specifying episode nums it is because the default param is all")
+    
+    ticker = None
 
     # First, determine the global min and max Exploration Rate across all data
     for session_number, episode_nums, color in [(session_number1, episode_nums1, colors[0]), (session_number2, episode_nums2, colors[1])]:
@@ -612,6 +614,9 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
             state_log_df = pd.read_csv(file_path)
             state_log_df['Date'] = pd.to_datetime(state_log_df['Date'], format='%Y%m%d')
             state_log_df['Cumulative Reward'] = state_log_df['Reward'].cumsum()
+            
+            if ticker is None and 'Symbol' in state_log_df.columns:
+                ticker = state_log_df['Symbol'].iloc[0]
 
             # Update the min/max values for exploration rate across all episodes and sessions
             min_exploration_rate = min(min_exploration_rate, state_log_df['Exploration Rate'].min())
@@ -647,7 +652,7 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
             # Plot individual metrics
             for i, metric in enumerate(metrics):
                 axs[i].plot(state_log_df['Date'], state_log_df[metric], label=f"{metric} Session {session_number} Episode {episode_num}", color=color)
-                axs[i].set_title(f"{metric} over Time", fontsize=10)
+                axs[i].set_title(f"{ticker} | {metric} over Time", fontsize=10)
                 axs[i].set_xlabel('Date', fontsize=9)
                 axs[i].set_ylabel(metric, fontsize=9)
                 axs[i].legend(framealpha=0.5, loc='upper left')
@@ -655,7 +660,7 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
             # Plot Total Value and Exploration Rate
             ax_tv = axs[-3]
             ax_tv.plot(state_log_df['Date'], state_log_df['Total Value'], label=f"Total Value (S{session_number} E{episode_num})", color=color)
-            ax_tv.set_title('Total Value and Exploration Rate', fontsize=10)
+            ax_tv.set_title(f'{ticker} | Total Value and Exploration Rate', fontsize=10)
             ax_tv.set_xlabel('Date', fontsize=9)
             ax_tv.set_ylabel('Total Value', fontsize=9)
             ax_tv.legend(loc='upper left', framealpha=0.5)
@@ -675,7 +680,7 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
             ax_combined = axs[-2]
             ax_combined.plot(state_log_df['Date'], state_log_df['Num Units Traded'], label=f"Units Traded (S{session_number} E{episode_num})", color=color)
             ax_combined.set_ylabel('Units Traded', fontsize=9)
-            ax_combined.set_title('Num Units Traded and Cumulative Reward', fontsize=10)
+            ax_combined.set_title(f'{ticker} | Num Units Traded and Cumulative Reward', fontsize=10)
             ax_combined.legend(loc='upper left', framealpha=0.5)
 
             ax_cr = ax_combined.twinx()
@@ -701,7 +706,19 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
 
     # Adjust layout to avoid overlaps and make the plot look neat
     plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+    
+    if len(episode_nums1) == 1:
+        results_directory = os.path.join('analysis_results', 'state_graphs')
+        os.makedirs(results_directory, exist_ok=True)
+        
+        episode_nums2_str = [str(num) for num in episode_nums2]
+        episode_nums2_joined = '_'.join(episode_nums2_str)
+        plot_name = f"{ticker}_ep_{episode_nums1[0]}_vs_{episode_nums2_joined}.png"
+
+        plt.savefig(os.path.join(results_directory, plot_name))
+        
     plt.show()
+    
     
     
 def find_zero_exploration_intervals_and_data(session_number, print_all=True):
