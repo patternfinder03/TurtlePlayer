@@ -1,13 +1,13 @@
 # TurtlePlayer
 
-TurtlePlayer is a reinforcement learning framework designed for financial trading strategies using the Turtle Trading system. It differs from most RL traders in that the action space isn't correlated with buying, selling, holding actions. Instead, the action space adjusts the lookback period for entries and exits. The 
-type 1 turtle strategy enters when a close exceeds the previous 20 day's high and an exit when the close prie is below the previous 10 day's low. Turtle Player can dynamically adjust these periods(well just the entry period as in this model the exit period = entry period / 2). You can mess around with your own turtle players and use the config to generate unique turtle players. 
+TurtlePlayer is a reinforcement learning framework designed for financial trading strategies using the Turtle Trading system. It differs from most RL traders in that the action space isn't correlated with buying, selling, and holding actions. Instead, the action space adjusts the lookback period for entries and exits. The 
+type 1 turtle strategy enters when a close exceeds the previous day's 20 day high and exits when the close price is below the previous 10 day's low. Turtle Player can dynamically adjust these periods. Feel free to modify the parameters in config.py to make your own turtle traders.
 
 ## Description
 
-At it's core Turtle Player was designed to experiment with RL in trading where the action space isn't associated with buying or selling. As the turtle trading strategy and basically all variations of it have been priced in, it is highly unlikely that turtle player will be able to generate competitive retuns, but the concept of non-trading action spaces might spin out some interesting algorithms.
+At its core, Turtle Player is designed to experiment with RL in trading where the action space isn't associated with buying or selling. As the turtle trading strategy and basically all variations of it have been priced in, it is highly unlikely that turtle player will be able to generate competitive returns.
 
-Turtle Player is built using Gymnasium and PyTorch for Rl and NN training. Pandas and Numpy for data loading and manipulation, and Matplotlib, tabulate, and imageio for analysis.
+Turtle Player is built using Gymnasium and PyTorch for RL and NN training, Pandas and Numpy for data loading and manipulation, and Matplotlib, tabulate, and imageio for analysis.
 
 ![Alt text](src/analysis_results/msft_dqn.gif "Optional title")
 
@@ -84,7 +84,7 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 
 # Actual results
 
-## Performance result tables(comparing Base turtle and TurtlePlayer when exploration rate == 0) and graphs(graphs contain full time period)
+## Performance result tables (comparing Base Turtle and TurtlePlayer when exploration rate == 0) and graphs.
 
 
 ### F Performance Results
