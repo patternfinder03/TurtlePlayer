@@ -1,6 +1,9 @@
 import sys
 import time
 import pygame
+import imageio 
+
+save_gif = False
 
 class TurtleStockGraph:
     """
@@ -8,7 +11,7 @@ class TurtleStockGraph:
     It creates a graphical representation of stock prices and marks the points of buy and sell actions. Used in
     render function for gym
     """
-    def __init__(self, width, height, background_color, dynamic_exit, max_window_size=100):
+    def __init__(self, width, height, background_color, dynamic_exit, max_window_size=100, stock_name=None):
         """
         Initializes the StockGraph object.
 
@@ -27,6 +30,10 @@ class TurtleStockGraph:
             0: (0, 255, 0),  # Green for 'buy'
             1: (255, 0, 0),  # Red for 'sell'
         }
+        self.stock_name = stock_name
+        
+        
+        self.frames = []
         
 
     def process_events(self):
@@ -41,7 +48,7 @@ class TurtleStockGraph:
         except:
             time.sleep(1)
 
-    def update_graph(self, prices, actions, rolling_high, rolling_low, directions):
+    def update_graph(self, prices, actions, rolling_high, rolling_low, directions, date):
         """
         Updates the graph with prices, actions, rolling highs, and rolling lows.
         It colors the rolling highs based on the action taken.
@@ -69,6 +76,15 @@ class TurtleStockGraph:
             max_price = min_price + 1  # Avoid division by zero
 
         self.screen.fill(self.background_color)
+    
+        title_text = self.font.render(self.stock_name + " Stock Graph", True, (255, 255, 255))
+        title_position = ((self.width - title_text.get_width()) // 2, 10)  # Center the title
+        self.screen.blit(title_text, title_position)
+        
+        date_text = self.font.render(date, True, (255, 255, 255))
+        date_position = ((self.width - date_text.get_width()) // 2, self.height - 30)  # Center horizontally and near the bottom
+        self.screen.blit(date_text, date_position)
+
         self._draw_axes_and_labels(prices, len(prices))
         self._draw_gridlines(len(prices), min_price, max_price)
 
@@ -102,8 +118,18 @@ class TurtleStockGraph:
                 color = self.colors[action]
                 pygame.draw.circle(self.screen, color, (int(x), int(y)), 5)
 
+        self._draw_legend()
         pygame.display.flip()
         
+        if save_gif:
+            frame_image = pygame.surfarray.array3d(pygame.display.get_surface())
+            frame_image = frame_image.transpose([1, 0, 2])
+            self.frames.append(frame_image)
+            
+        
+    def save_as_gif(self, filename='output.gif', duration=0.1):
+        # Save the captured frames as a GIF
+        imageio.mimsave(filename, self.frames, duration=duration)
         
     def _direction_color(self, direction):
         """
@@ -140,7 +166,7 @@ class TurtleStockGraph:
         """
         pygame.display.quit()
         pygame.quit()
-
+        
     def _initialize_window(self):
         """
         Initializes the Pygame window and other necessary components.
@@ -149,8 +175,17 @@ class TurtleStockGraph:
         self.screen = pygame.display.set_mode((self.width, self.height))
         self.screen.fill(self.background_color)
         self.font = pygame.font.Font(None, 24)
+
+        # Set window title with stock name
+        pygame.display.set_caption(self.stock_name + " Stock Graph")
+
+        # Optionally, draw the stock name at the top of the window
+        title_surf = self.font.render(self.stock_name + " Stock Graph", True, (255, 255, 255))
+        self.screen.blit(title_surf, ((self.width - title_surf.get_width()) // 2, 10))
+
         pygame.display.flip()
         self.initialized = True
+
 
     def _draw_axes_and_labels(self, prices, num_steps):
         """
@@ -177,11 +212,6 @@ class TurtleStockGraph:
             label = self.font.render(str(i), True, (255, 255, 255))
             self.screen.blit(label, (5, y - label.get_height() // 2))
 
-        # Draw x-axis labels (steps)
-        for i in range(num_steps):
-            x = 50 + (i * (self.width - 100) / (num_steps - 1))
-            label = self.font.render(str(i), True, (255, 255, 255))
-            self.screen.blit(label, (x, self.height - 35))
 
     def _draw_gridlines(self, num_steps, min_price, max_price):
         """
@@ -209,3 +239,39 @@ class TurtleStockGraph:
         for i in range(num_steps):
             x = 50 + (i * (self.width - 100) / (num_steps - 1))
             pygame.draw.line(self.screen, (50, 50, 50), (x, 50), (x, self.height - 50))
+            
+            
+    def _draw_legend(self):
+        """
+        Draws a legend on the graph to explain what the colors and symbols mean:
+        Blue -> Expand period
+        Yellow -> Contract period
+        Magenta -> Do nothing
+        Green Circle -> Buy a unit
+        Red Circle -> Sell all units
+        """
+        legend_entries = [
+            ("Blue", (0, 0, 255), "Expand period"),
+            ("Yellow", (255, 255, 0), "Contract period"),
+            ("Magenta", (255, 0, 255), "Do nothing"),
+            ("Green Circle", (0, 255, 0), "Buy a unit"),
+            ("Red Circle", (255, 0, 0), "Sell all units")
+        ]
+
+        start_x = 50  # Starting x coordinate for the legend
+        start_y = 20  # Starting y coordinate for the legend
+
+        for i, (name, color, description) in enumerate(legend_entries):
+            if "Circle" in name:
+                # Draw the circle for buy/sell indicators
+                pygame.draw.circle(self.screen, color, (start_x + 10, start_y + i * 30 + 10), 10)
+            else:
+                # Draw the color box for color-coded lines
+                pygame.draw.rect(self.screen, color, (start_x, start_y + i * 30, 20, 20))
+            
+            # Draw the description text
+            text = self.font.render(description, True, (255, 255, 255))
+            self.screen.blit(text, (start_x + 25, start_y + i * 30))
+
+        # Optionally, draw a box around the legend
+        pygame.draw.rect(self.screen, (255, 255, 255), (start_x - 10, start_y - 10, 280, 180), 1)

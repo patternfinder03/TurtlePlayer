@@ -207,63 +207,6 @@ def turtleSolverV2(starting_index: int, exit_period: int, pre_prices: List[float
 
 
 
-# def calculate_reward_v2(solver_data, agent_actions, agent_windows):
-#     assert len(agent_windows) == len(agent_actions) == len(solver_data), "Input lists must have the same length."
-#     rewards = []  # List to store rewards for each time step
-#     future_window_size = 5  # Define the future window size for checking closeness to transition points
-
-#     for i, (agent_window, agent_action) in enumerate(zip(agent_windows, agent_actions)):
-#         reward = 0  # Initialize reward for the current time step
-#         solver_window = solver_data[i]
-
-#         if solver_window['optimal_action'] == 'ClosePosition':
-#             rewards.append(reward)
-#             continue
-
-#         # Calculate distance from the ideal window
-#         distance_to_ideal = abs(agent_window - solver_window['smoothed_ideal'])
-
-#         # Check for approaching transition to BuyRange or AvoidBuyRange within the future window
-#         transition_approaching = any(future_window['optimal_action'] in ['BuyRange', 'AvoidBuyRange']
-#                                      for future_window in solver_data[i + 1:i + 1 + future_window_size]
-#                                      if solver_window['optimal_action'] not in ['BuyRange', 'AvoidBuyRange'])
-
-#         # Reward/Penalty Logic
-#         if solver_window['optimal_action'] in ['BuyRange', 'AvoidBuyRange']:
-#             range_width = max(solver_window['max'] - solver_window['min'], 1)
-#             if solver_window['min'] <= agent_window <= solver_window['max']:
-#                 # Reward calculation
-#                 base_reward = 0.75 * (1 - distance_to_ideal / range_width)
-#                 reward += base_reward * (0.55 if transition_approaching else 0.3)
-
-#                 # Adjustments based on agent's action
-#                 if (agent_window > solver_window['smoothed_ideal'] and agent_action == 'Decrease') or \
-#                    (agent_window < solver_window['smoothed_ideal'] and agent_action == 'Increase'):
-#                     reward += 0.15
-#                 elif agent_action == 'Nothing':
-#                     reward += 0.075
-#                 else:
-#                     reward -= 0.15
-#             else:
-#                 # Penalty calculation
-#                 log_factor = max(1/math.log(range_width, 2), 1)
-#                 base_penalty = -0.5 * (1 - 1 / log_factor)
-#                 reward += base_penalty * (1.15 if transition_approaching else 1.75)
-
-#                 # Adjustments based on agent's action
-#                 if (agent_window < solver_window['min'] and agent_action == 'Increase') or \
-#                    (agent_window > solver_window['max'] and agent_action == 'Decrease'):
-#                     reward += 0.2
-#                 else:
-#                     reward -= 0.2
-
-#         rewards.append(round(reward, 3))  # Append the reward for the current time step to the list
-
-#     return rewards, solver_data
-
-
-
-
 def calculate_reward_v2(solver_data, agent_actions, agent_windows):
     assert len(agent_windows) == len(agent_actions) == len(solver_data), "Input lists must have the same length. They have lengths of: " + str(len(agent_windows)) + ", " + str(len(agent_actions)) + ", and " + str(len(solver_data)) + " respectively."""
     rewards = []  # List to store rewards for each time step

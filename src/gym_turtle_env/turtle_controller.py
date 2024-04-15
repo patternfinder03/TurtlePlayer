@@ -11,7 +11,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from typing import List, Tuple, Union
 from price_movement.actual.actual_price_getter import TurtleActualPriceGetter
 
-
+save_graph = False
 class TurtleController:
     """
     The Controller class manages the interaction between the turtle trading environment and an agent.
@@ -46,12 +46,12 @@ class TurtleController:
         stock_name = price_movement_type.split(" ")[1]
         self.trader = TurtleTrader(stock_name, base_period, expand_by, shrink_by, absolute_min, absolute_max, account_value, dollars_per_point, dynamic_exit)
                       #  Initialize the TurtleTrader object. Will need to change if using TurtleSimple Turtle Trader
-
         
         # GRAPH ------------------------------------------------------------------------------------------------------        
         self.render_graph = render # Initialize the TurtleStockGraph object if rendering is enabled
+        stock_name = price_movement_type.split(" ")[1]
         if self.render_graph:
-            self.graph = TurtleStockGraph(800, 600, (0, 0, 0), self.trader.dynamic_exit, 50)
+            self.graph = TurtleStockGraph(800, 600, (0, 0, 0), self.trader.dynamic_exit, 50, stock_name)
             
         # PRICE GENERATOR --------------------------------------------------------------------------------------------
         if "Actual" in price_movement_type: # Only Actual in CRSP dataset supported for now
@@ -108,7 +108,9 @@ class TurtleController:
             return self.get_state(), self.get_reward(is_complete=False), False, False, self.get_info()
         else:
             self.trader.close_all_positions()
-            self._get_next_price()                             # Returns True for done
+            self._get_next_price()   
+            if save_graph:
+                self.graph.save_as_gif('test2.gif', duration=.3)                   # Returns True for done
             return self.get_state(), self.get_reward(is_complete=True), True, False, self.get_info()
 
     def _get_next_price(self):
@@ -186,7 +188,7 @@ class TurtleController:
         if len(self.trader.action_list) > 1:
             self.graph.screen.fill(self.graph.background_color)
             if len(self.trader.close_price_list) > len(self.trader.action_list):
-                self.graph.update_graph(self.trader.close_price_list[:-1], self.trader.trade_action_list, self.trader.rolling_high_list[:-1], self.trader.rolling_low_list[:-1],self.trader.action_list)
+                self.graph.update_graph(self.trader.close_price_list[:-1], self.trader.trade_action_list, self.trader.rolling_high_list[:-1], self.trader.rolling_low_list[:-1],self.trader.action_list, str(self.trader.dates[-1])[0:4])
             else:
                 raise ValueError("Given implementation shouldn't be here. Close Price list and Action list should be the same length")
             

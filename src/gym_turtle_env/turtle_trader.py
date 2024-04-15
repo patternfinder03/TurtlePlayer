@@ -261,7 +261,7 @@ class TurtleTrader:
         sell_action_taken = False
         
         # Check for stop loss hits
-        #ToDo: Uncomment this
+        # ToDo: Uncomment this in future versions
         # positions_to_close = [unit for unit in self.open_positions['long'] if current_price <= unit.stop_loss_level]
         # if positions_to_close:
         #     self._close_multiple_positions(positions_to_close)

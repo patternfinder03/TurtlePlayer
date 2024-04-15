@@ -51,7 +51,7 @@ print_rewards = False # Prints rewards to console
 
 # AGENT AGENT AGENT AGENT AGENT AGENT AGENT AGENT AGENT AGENT AGENT AGENT AGENT
 discount_factor = .5 # Discount factor
-train_episodes = 100 # Number of episodes to train | Note experience does not carry over between episodes as its the stock market and keeping any information is cheating
+train_episodes = 1 # Number of episodes to train | Base agent must have 1 episode | Note experience does not carry over between episodes as its the stock market and keeping any information is cheating
 exploration_decay = .997 # Exploration decay rate
 learning_rate = .001 # Learning rate
 batch_size = 64 # Batch size
@@ -60,14 +60,14 @@ memory_size = 512 # Memory size
 # ENVIRONMENT ENVIRONMENT ENVIRONMENT ENVIRONMENT ENVIRONMENT ENVIRONMENT ENVIRONMENT
 override_params = {
     'state_type': 'BasicWithPositions', # Others: 'BasicWithPositions'
-    'price_movement_type': 'Actual COKE', # See price_movemen/actual/data for tickers available. For more data contact ay13@illinois.edu
+    'price_movement_type': 'Actual MSFT', # See price_movement/actual/data for tickers available. For more data contact ay13@illinois.edu
     'num_prev_obvs': 50, # Number of lags to use in state
     'offset_scaling': True, # Applies offset scaling to state
     'scale': True, # Applies a StandardScaler to state
-    'base_period': 50, # Initial Period
+    'base_period': 20, # Initial Period
     'expand_by': 1, # Increase period by
     'shrink_by': 1, # Decrease period by
-    'absolute_min': 35, # Min period
-    'absolute_max': 75, # Max period
+    'absolute_min': 15, # Min period
+    'absolute_max': 35, # Max period
     'account_value': 10000000, # Default is 1000000
 }
