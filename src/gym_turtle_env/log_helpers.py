@@ -17,6 +17,7 @@ current_working_dir = Path.cwd()
 
 # Construct paths relative to the current working directory
 base_log_dir = current_working_dir / 'logs'
+analysis_dir = current_working_dir / 'analysis_results'
 config_dir = current_working_dir / 'config.py'
 
 
@@ -250,12 +251,17 @@ def tabulate_state_history_stats(session_number, start_date=None, end_date=None)
     # Step 1: Extract the episode numbers and sort the files based on them
     file_names = [f for f in os.listdir(directory_path) if f.startswith("state_history_log_ep_") and f.endswith(".csv")]
     file_names_sorted = sorted(file_names, key=lambda x: int(x.split('_')[4].split('.')[0]))
+    
+    ticker = None
 
     # Step 2: Iterate through the sorted file names
     for file_name in file_names_sorted:
         file_path = os.path.join(directory_path, file_name)
         df = pd.read_csv(file_path)
         df['Date'] = pd.to_datetime(df['Date'], format='%Y%m%d')
+        
+        if ticker is None:
+            ticker = df['Symbol'].iloc[0]
 
         if 'Reward' in df.columns:
             df['Cumulative Reward'] = df['Reward'].cumsum()
@@ -319,7 +325,49 @@ def tabulate_state_history_stats(session_number, start_date=None, end_date=None)
         f"{avg_pnl_change:.2f}%",
         f"{avg_units_traded:,.2f}"
     ])
+    
 
+    pnl_statistics_average = [[
+        ticker,
+        "DQN Episode Average",
+        round(avg_initial_value, 2),
+        round(avg_final_value, 2),
+        round(avg_cumulative_reward, 2),
+        round(avg_pnl_change, 2),
+        round(avg_units_traded, 2)
+    ]]
+    
+    
+    pnl_statistics_base = [[
+        ticker,
+        "Base Episode",
+        round(float(pnl_statistics[0][1].replace(',', '')), 2),
+        round(float(pnl_statistics[0][2].replace(',', '')), 2),
+        round(float(pnl_statistics[0][3].replace(',', '')), 2),
+        round(float(pnl_statistics[0][4].replace('%', '')), 2),
+        round(float(pnl_statistics[0][5].replace(',', '')), 2)
+    ]]
+    
+    
+    if len(file_names) > 1:
+        results_path = os.path.join('analysis_results', 'overall_results.csv')
+        df_stats = pd.DataFrame(pnl_statistics_average, columns=['Ticker', 'Episode', 'Initial Total Value', 'Final Total Value', 'Cumulative Reward', 'PnL% Change', 'Total Units Traded'])
+        
+        if not os.path.exists(results_path):
+            df_stats.to_csv(results_path, index=False)
+        else:
+            df_stats.to_csv(results_path, mode='a', header=False, index=False)
+    else:
+        results_path = os.path.join('analysis_results', 'overall_results.csv')
+        df_stats = pd.DataFrame(pnl_statistics_base, columns=['Ticker', 'Episode', 'Initial Total Value', 'Final Total Value', 'Cumulative Reward', 'PnL% Change', 'Total Units Traded'])
+        
+        if not os.path.exists(results_path):
+            df_stats.to_csv(results_path, index=False)
+        else:
+            df_stats.to_csv(results_path, mode='a', header=False, index=False)
+
+    
+    
     headers = ['Episode', 'Initial Total Value', 'Final Total Value', 'Cumulative Reward', 'PnL% Change', 'Total Units Traded']
     print(tabulate(pnl_statistics, headers=headers, tablefmt='grid'))
 
@@ -541,6 +589,15 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
     
     min_cumulative_reward = float('inf')
     max_cumulative_reward = float('-inf')
+    
+    if episode_nums1 == 'All':
+        episode_nums1 = [f.split('_')[-1].split('.')[0] for f in os.listdir(get_log_file_path(session_number1, 'state_history_logs'))]
+        
+    if episode_nums2 == 'All':
+        episode_nums2 = [f.split('_')[-1].split('.')[0] for f in os.listdir(get_log_file_path(session_number2, 'state_history_logs'))]
+        
+    if len(episode_nums1) + len(episode_nums2) > 5:
+        raise ValueError("Too many episodes to plot. Please limit to 5 or fewer episodes. If not specifying episode nums it is because the default param is all")
 
     # First, determine the global min and max Exploration Rate across all data
     for session_number, episode_nums, color in [(session_number1, episode_nums1, colors[0]), (session_number2, episode_nums2, colors[1])]:
@@ -659,11 +716,17 @@ def find_zero_exploration_intervals_and_data(session_number, print_all=True):
     pnl_statistics = []
     detailed_data = []
     date_pnl_map = {}
+    date_period_map = {}
+    
+    ticker = None
 
     for file_name in file_names_sorted:
         file_path = os.path.join(directory_path, file_name)
         df = pd.read_csv(file_path)
         df['Date'] = pd.to_datetime(df['Date'], format='%Y%m%d')
+        
+        if ticker is None and 'Symbol' in df.columns:
+            ticker = df['Symbol'].iloc[0]
 
         if 'Reward' in df.columns:
             df['Cumulative Reward'] = df['Reward'].cumsum()
@@ -680,6 +743,8 @@ def find_zero_exploration_intervals_and_data(session_number, print_all=True):
             initial_value = block_data['Total Value'].iloc[0]
             final_value = block_data['Total Value'].iloc[-1]
             pnl_change = ((final_value - initial_value) / initial_value) * 100 if initial_value != 0 else 0
+            
+            mean_period = block_data['Period'].mean()
 
             start_date = block_data['Date'].iloc[0].strftime('%Y-%m-%d')
             end_date = block_data['Date'].iloc[-1].strftime('%Y-%m-%d')
@@ -690,13 +755,19 @@ def find_zero_exploration_intervals_and_data(session_number, print_all=True):
 
             date_pnl_map[date_key].append(pnl_change)
             
+            if date_key not in date_period_map:
+                date_period_map[date_key] = []
+            
+            date_period_map[date_key].append(mean_period)
+            
             pnl_statistics.append([
                 file_name.replace('.csv', ''),
                 start_date,
                 end_date,
                 f"{initial_value:.2f}",
                 f"{final_value:.2f}",
-                f"{pnl_change:.2f}%"
+                f"{pnl_change:.2f}%",
+                f"{mean_period:.2f}"
             ])
 
             # Collecting detailed data for each episode
@@ -709,22 +780,25 @@ def find_zero_exploration_intervals_and_data(session_number, print_all=True):
 
     # Average PnL for each date pair
     average_pnl_statistics = []
-    for dates, pnl_changes in date_pnl_map.items():
+    for (date1, pnl_changes), (date2, mean_periods) in zip(date_pnl_map.items(), date_period_map.items()):
         avg_pnl = sum(pnl_changes) / len(pnl_changes)
+        avg_period = sum(mean_periods) / len(mean_periods)
         average_pnl_statistics.append([
-            dates[0], dates[1], f"{avg_pnl:.2f}%"
+            ticker, 'DQN_Average', date1[0], date2[1], f"{avg_pnl:.2f}%", f"{avg_period:.2f}"
         ])
 
-    headers = ['Episode', 'Start Date', 'End Date', 'Initial Total Value', 'Final Total Value', 'PnL% Change']
-    average_headers = ['Start Date', 'End Date', 'Average PnL% Change']
+    headers = ['Episode', 'Start Date', 'End Date', 'Initial Total Value', 'Final Total Value', 'PnL% Change', 'Mean Period']
+    average_headers = ['Ticker', 'Episode', 'Start Date', 'End Date', 'Average PnL% Change', 'Average Mean Period']
     if print_all:
         print(tabulate(pnl_statistics, headers=headers, tablefmt='grid'))
     print("\nAverage PnL% Change by Date:")
     print(tabulate(average_pnl_statistics, headers=average_headers, tablefmt='grid'))
+    
+    return pnl_statistics, average_pnl_statistics, detailed_data
 
 
 def find_zero_exploration_intervals_comparison(base_session_number, session_number):
-    find_zero_exploration_intervals_and_data(session_number, print_all=False)
+    pnl_statistics, average_pnl_statistics, detailed_data = find_zero_exploration_intervals_and_data(session_number, print_all=False)
     directory_path = get_log_file_path(session_number, 'state_history_logs')
     base_directory_path = get_log_file_path(base_session_number, 'state_history_logs')
 
@@ -740,15 +814,13 @@ def find_zero_exploration_intervals_comparison(base_session_number, session_numb
     unique_dates = set()
     date_pnl_map = {}
 
-    # Collect all unique zero exploration intervals from the main session
     for file_name in file_names:
         file_path = os.path.join(directory_path, file_name)
         df = pd.read_csv(file_path)
         df['Date'] = pd.to_datetime(df['Date'], format='%Y%m%d')
-
-        # Mark the rows where exploration rate is zero
         df['is_zero_exploration'] = (df['Exploration Rate'] == 0)
         df['block'] = df['is_zero_exploration'].ne(df['is_zero_exploration'].shift()).cumsum()
+        ticker = df['Symbol'].iloc[0] if 'Symbol' in df.columns else 'Unknown'
 
         blocks = df[df['is_zero_exploration']].groupby('block')
         for _, block in blocks:
@@ -760,26 +832,21 @@ def find_zero_exploration_intervals_comparison(base_session_number, session_numb
             final_value = block['Total Value'].iloc[-1]
             pnl_change = ((final_value - initial_value) / initial_value * 100) if initial_value != 0 else 0
             date_key = (start_date, end_date)
-
             unique_dates.add(date_key)
             if date_key not in date_pnl_map:
                 date_pnl_map[date_key] = []
             date_pnl_map[date_key].append(pnl_change)
 
-    # Sort the unique dates
-    sorted_unique_dates = sorted(unique_dates, key=lambda x: x[0])
+    # Creating CSV Output
+    results_path = os.path.join('analysis_results', 'performance_results.csv')
+    headers = ['Ticker', 'Episode', 'Start Date', 'End Date', 'PnL% Change', 'Period']
+    results_data = []
 
-    # Process the base session data based on the intervals found above
-    pnl_statistics_base_session = []
-    for start_date, end_date in sorted_unique_dates:
+    for start_date, end_date in sorted(unique_dates, key=lambda x: x[0]):
         base_file_names = sorted(
             [f for f in os.listdir(base_directory_path) if f.startswith("state_history_log_ep_") and f.endswith(".csv")],
             key=lambda x: int(x.split('_')[4].split('.')[0])
         )
-        
-        if len(base_file_names) != 1:
-            raise ValueError("For the first session please use a BaseAgent with only one episode.")
-
         for base_file_name in base_file_names:
             base_file_path = os.path.join(base_directory_path, base_file_name)
             base_df = pd.read_csv(base_file_path)
@@ -787,21 +854,38 @@ def find_zero_exploration_intervals_comparison(base_session_number, session_numb
 
             mask = (base_df['Date'] >= start_date) & (base_df['Date'] <= end_date)
             filtered_df = base_df[mask]
-
             if not filtered_df.empty:
                 initial_value = filtered_df['Total Value'].iloc[0]
                 final_value = filtered_df['Total Value'].iloc[-1]
                 pnl_change = ((final_value - initial_value) / initial_value * 100) if initial_value != 0 else 0
-
-                pnl_statistics_base_session.append([
-                    base_file_name.replace('.csv', ''),
+                results_data.append([
+                    ticker,
+                    'Base',
                     start_date.strftime('%Y-%m-%d'),
                     end_date.strftime('%Y-%m-%d'),
-                    f"{initial_value:.2f}",
-                    f"{final_value:.2f}",
-                    f"{pnl_change:.2f}%"
+                    f"{pnl_change:.2f}%",
+                    20
                 ])
 
-    headers_base = ['Episode', 'Start Date', 'End Date', 'Initial Total Value', 'Final Total Value', 'PnL% Change']
+    # Output to CSV
+    df_results = pd.DataFrame(results_data, columns=headers)
+    if not os.path.exists(results_path):
+        df_results.to_csv(results_path, index=False)
+    else:
+        df_results.to_csv(results_path, mode='a', header=False, index=False)
+        
+    
+        
+    df_dqn = pd.DataFrame(average_pnl_statistics, columns=['Ticker', 'Episode', 'Start Date', 'End Date', 'PnL% Change', 'Period'])
+    # df_dqn['Ticker'] = ticker
+    # df_dqn['Episode'] = 'DQN_Average'
+    # df_dqn = df_dqn[['Ticker', 'Episode', 'Start Date', 'End Date', 'PnL% Change']]
+
+    
+    if not os.path.exists(results_path):
+        df_dqn.to_csv(results_path, index=False)
+    else:
+        df_dqn.to_csv(results_path, mode='a', header=False, index=False)
+
     print("\nDetailed PnL% Change by Date from Base Session Number:")
-    print(tabulate(pnl_statistics_base_session, headers=headers_base, tablefmt='grid'))
+    print(tabulate(results_data, headers=headers, tablefmt='grid'))

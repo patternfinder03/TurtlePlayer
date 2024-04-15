@@ -1,0 +1,3 @@
+Ticker,Episode,Initial Total Value,Final Total Value,Cumulative Reward,PnL% Change,Total Units Traded
+MSFT,Base Episode,10000000.0,10236146.0,1031.92,2.36,436.0
+MSFT,DQN Episode Average,10000000.0,10356828.89,1287.26,3.57,377.3
