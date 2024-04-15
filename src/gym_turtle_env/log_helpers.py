@@ -564,7 +564,7 @@ def plot_trading_log(session_number, episode_nums, start_date=None, end_date=Non
         print(tabulate(stats, headers='keys', tablefmt='psql', showindex=False))
         
         
-def plot_state_history_comparison(session_number1, session_number2, episode_nums1, episode_nums2, start_date=None, end_date=None):
+def plot_state_history_comparison(session_number1, session_number2, episode_nums1, episode_nums2, start_date=None, end_date=None, save_plot=False):
     """
     Plot account states over time for specified episode numbers from two sessions,
     filtered by the specified date range on the same plot for comparison.
@@ -578,7 +578,10 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
     - end_date: The end date to filter the data.
     """
     metrics = ['Price', 'Account Total Equity']
-    colors = ['blue', 'red', 'orange', 'green', 'yellow']
+    colors = ['blue', 'red', 'orange', 'green', 'yellow', 'purple']
+    
+    if len(episode_nums1) + len(episode_nums2) > 5:
+        raise ValueError("Too many episodes to plot. Please limit to 5 or fewer episodes.")
 
     # Adjust the figure size and the subplot layout
     fig, axs = plt.subplots(len(metrics) + 3, 1, figsize=(12, 10))  # Total height increased
@@ -778,7 +781,7 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
         ax_periods.legend(framealpha=0.5)
     
     
-    if len(episode_nums1) == 1:
+    if len(episode_nums1) == 1 and save_plot:
         results_directory = os.path.join('analysis_results', 'state_graphs')
         os.makedirs(results_directory, exist_ok=True)
         

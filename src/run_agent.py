@@ -1,4 +1,5 @@
 import argparse
+import warnings
 import gymnasium as gym
 from config import override_params, train_episodes
 from agents.base_agent.baseagent import BaseAgent
@@ -35,11 +36,11 @@ if __name__ == '__main__':
     
     if args.agent == 'BaseAgent':
         if train_episodes > 1:
-            raise ValueError("BaseAgent can only be run with a single train episode as it's the base turtle strategy")
+            raise ValueError("BaseAgent can only be run with a single train episode as it's the base turtle strategy and anymore would be redundant.")
         
     if args.agent == 'DQNAgent':
         if train_episodes == 1:
-            raise Warning("DQNAgent usually want more train episodes as it's stochastic")
+            warnings.warn("DQNAgent usually you will want more train episodes as it's stochastic and more episodes will paint a better picture")
     
     env = gym.make('TurtleTradingEnv', render_mode=render_mode, override_params=override_params)
     agent = get_agent_class(args.agent, env)

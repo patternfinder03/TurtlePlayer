@@ -10,6 +10,7 @@ project_dir = Path.cwd()
 """
 Log Notes:
 
+# Example logs
 1. MSFT Base
 2. MSFT DQN
 3. NVDA Base
@@ -30,12 +31,15 @@ Log Notes:
 18. Google DQN
 19. Amazon Base
 20. Amazon DQN
+#
+
+21. Your first log
 """
 
 # CRITICAL CRITCAL CRITICAL CRITICAL CRITICAL CRITICAL CRITICAL CRITICAL CRITICAL
 render_episode = False # Needs to be set to True for render_wait_time to activate
 render_wait_time = 0.0001 # Lower time makes render go faster
-save_log = True # Save training log
+save_log = False # Save training log
 plot_training_results = False # Plot training results
 
 # DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG
@@ -47,7 +51,7 @@ print_rewards = False # Prints rewards to console
 
 # AGENT AGENT AGENT AGENT AGENT AGENT AGENT AGENT AGENT AGENT AGENT AGENT AGENT
 discount_factor = .5 # Discount factor
-train_episodes = 100 # Number of episodes to train
+train_episodes = 100 # Number of episodes to train | Note experience does not carry over between episodes as its the stock market and keeping any information is cheating
 exploration_decay = .997 # Exploration decay rate
 learning_rate = .001 # Learning rate
 batch_size = 64 # Batch size
