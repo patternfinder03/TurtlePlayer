@@ -10,6 +10,28 @@ project_dir = Path.cwd()
 """
 Log Notes:
 
+1. MSFT Base
+2. MSFT DQN
+3. NVDA Base
+4. NVDA DQN
+5. Ford Base
+6. Ford DQN
+7. Target Base
+8. Target DQN
+9. Macy's Base
+10. Macy's DQN
+11. Netflix Base
+12. Netflix DQN
+13. Coke Base
+14. Coke DQN
+15. Chevron Base
+16. Chevron DQN
+17. Tesla Base
+18. Tesla DQN
+19. Google Base
+20. Google DQN
+21. Amazon Base
+22. Amazon DQN
 """
 
 # CRITICAL CRITCAL CRITICAL CRITICAL CRITICAL CRITICAL CRITICAL CRITICAL CRITICAL
@@ -36,14 +58,14 @@ memory_size = 512 # Memory size
 # ENVIRONMENT ENVIRONMENT ENVIRONMENT ENVIRONMENT ENVIRONMENT ENVIRONMENT ENVIRONMENT
 override_params = {
     'state_type': 'BasicWithPositions', # Others: 'BasicWithPositions'
-    'price_movement_type': 'Actual MSFT', # See price_movemen/actual/data for tickers available. For more data contact ay13@illinois.edu
+    'price_movement_type': 'Actual COKE', # See price_movemen/actual/data for tickers available. For more data contact ay13@illinois.edu
     'num_prev_obvs': 50, # Number of lags to use in state
     'offset_scaling': True, # Applies offset scaling to state
     'scale': True, # Applies a StandardScaler to state
-    'base_period': 20, # Initial Period
+    'base_period': 50, # Initial Period
     'expand_by': 1, # Increase period by
     'shrink_by': 1, # Decrease period by
-    'absolute_min': 15, # Min period
-    'absolute_max': 35, # Max period
+    'absolute_min': 35, # Min period
+    'absolute_max': 75, # Max period
     'account_value': 10000000, # Default is 1000000
 }

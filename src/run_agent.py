@@ -33,13 +33,15 @@ if __name__ == '__main__':
     args = parse_arguments()
     render_mode = 'human' if args.render else None
     
-    if args.all_stocks:
-        raise RuntimeError("This is outdated and needs to be updated")
-        # from agents.run_multiple_stocks import run_all_stocks
-        # agent = AgentClass(None)
-        # run_all_stocks(agent, override_params)
-    else:
-        env = gym.make('TurtleTradingEnv', render_mode=render_mode, override_params=override_params)
-        agent = get_agent_class(args.agent, env)
-        from agents.run_single_stock import train_and_evaluate_agent_single_stock
-        train_and_evaluate_agent_single_stock(agent, env, train_episodes)
+    if args.agent == 'BaseAgent':
+        if train_episodes > 1:
+            raise ValueError("BaseAgent can only be run with a single train episode as it's the base turtle strategy")
+        
+    if args.agent == 'DQNAgent':
+        if train_episodes == 1:
+            raise Warning("DQNAgent usually want more train episodes as it's stochastic")
+    
+    env = gym.make('TurtleTradingEnv', render_mode=render_mode, override_params=override_params)
+    agent = get_agent_class(args.agent, env)
+    from agents.run_single_stock import train_and_evaluate_agent_single_stock
+    train_and_evaluate_agent_single_stock(agent, env, train_episodes)

@@ -1,0 +1,29 @@
+{
+    "agent_type": "BaseAgent",
+    "training_results": {
+        "rewards": [
+            1067.464000000033
+        ],
+        "final_periods": [
+            20
+        ],
+        "mean_periods": [
+            20.0
+        ],
+        "median_periods": [
+            20
+        ],
+        "total_pnl_percents": [
+            -32.476152878263015
+        ],
+        "total_pnls": [
+            130096.95367999974
+        ],
+        "exploration_rates": [
+            0
+        ],
+        "units_traded": [
+            422
+        ]
+    }
+}
