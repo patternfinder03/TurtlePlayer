@@ -28,7 +28,6 @@ class DQNAgentInveral:
         self.name = 'Deep Q-Learning Agent Interval'
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = self._build_model().to(self.device)
-        self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
         
         self.exploration_rates = [1]
         self.reward_intervals = []
@@ -46,7 +45,6 @@ class DQNAgentInveral:
         self.reward_intervals = []
         self.memory = deque(maxlen=self.memory_size_original)
         self.model = self._build_model().to(self.device)
-        # self.optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
 
     def _build_model(self):
         # Neural Net for Deep-Q learning Model

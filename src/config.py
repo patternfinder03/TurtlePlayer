@@ -11,10 +11,10 @@ project_dir = Path.cwd()
 Log Notes:
 
 # Example logs
-1. MSFT Base
-2. MSFT DQN
-3. NVDA Base
-4. NVDA DQN
+1. Microsoft Base
+2. Microsoft DQN
+3. Nvidia Base
+4. Nvidia DQN
 5. Ford Base
 6. Ford DQN
 7. Target Base
