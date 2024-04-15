@@ -578,7 +578,7 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
     - end_date: The end date to filter the data.
     """
     metrics = ['Price', 'Account Total Equity']
-    colors = ['blue', 'red', 'green', 'yellow', 'orange']
+    colors = ['blue', 'red', 'orange', 'green', 'yellow']
 
     # Adjust the figure size and the subplot layout
     fig, axs = plt.subplots(len(metrics) + 3, 1, figsize=(12, 10))  # Total height increased
@@ -600,6 +600,13 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
         raise ValueError("Too many episodes to plot. Please limit to 5 or fewer episodes. If not specifying episode nums it is because the default param is all")
     
     ticker = None
+    
+    reward_sums_all = []
+    total_values_all = []
+    total_equities_all = []
+    num_units_all = []
+    periods_all = []
+    exit_peiods_all = []
 
     # First, determine the global min and max Exploration Rate across all data
     for session_number, episode_nums, color in [(session_number1, episode_nums1, colors[0]), (session_number2, episode_nums2, colors[1])]:
@@ -627,10 +634,14 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
             
 
     # Load and filter data for each session and episode
+    color_index = 0
+    is_first = True
     for session_number, episode_nums, color in [(session_number1, episode_nums1, colors[0]), (session_number2, episode_nums2, colors[1])]:
         directory_path = get_log_file_path(session_number, 'state_history_logs')
         
         for episode_num in episode_nums:
+            color_use = colors[color_index]
+            color_index += 1
             file_path = os.path.join(directory_path, f'state_history_log_ep_{episode_num}.csv')
             
             if not os.path.exists(file_path):
@@ -651,7 +662,7 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
 
             # Plot individual metrics
             for i, metric in enumerate(metrics):
-                axs[i].plot(state_log_df['Date'], state_log_df[metric], label=f"{metric} Session {session_number} Episode {episode_num}", color=color)
+                axs[i].plot(state_log_df['Date'], state_log_df[metric], label=f"{metric} Session {session_number} Episode {episode_num}", color=color_use)
                 axs[i].set_title(f"{ticker} | {metric} over Time", fontsize=10)
                 axs[i].set_xlabel('Date', fontsize=9)
                 axs[i].set_ylabel(metric, fontsize=9)
@@ -659,14 +670,14 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
 
             # Plot Total Value and Exploration Rate
             ax_tv = axs[-3]
-            ax_tv.plot(state_log_df['Date'], state_log_df['Total Value'], label=f"Total Value (S{session_number} E{episode_num})", color=color)
+            ax_tv.plot(state_log_df['Date'], state_log_df['Total Value'], label=f"Total Value (S{session_number} E{episode_num})", color=color_use)
             ax_tv.set_title(f'{ticker} | Total Value and Exploration Rate', fontsize=10)
             ax_tv.set_xlabel('Date', fontsize=9)
             ax_tv.set_ylabel('Total Value', fontsize=9)
             ax_tv.legend(loc='upper left', framealpha=0.5)
 
             ax_er = ax_tv.twinx()
-            ax_er.plot(state_log_df['Date'], state_log_df['Exploration Rate'], label=f'Exploration Rate (S{session_number} E{episode_num})', color=color, linestyle='--', linewidth=2.0)
+            ax_er.plot(state_log_df['Date'], state_log_df['Exploration Rate'], label=f'Exploration Rate (S{session_number} E{episode_num})', color='black', linestyle='--', linewidth=2.0)
             ax_er.set_ylabel('Exploration Rate', fontsize=9)
             ax_er.set_ylim([min_exploration_rate, max_exploration_rate])
             # Adjusting both legends to be in the upper right with different vertical offsets
@@ -678,13 +689,13 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
 
             # Combined plot for Num Units Traded and Cumulative Reward
             ax_combined = axs[-2]
-            ax_combined.plot(state_log_df['Date'], state_log_df['Num Units Traded'], label=f"Units Traded (S{session_number} E{episode_num})", color=color)
+            ax_combined.plot(state_log_df['Date'], state_log_df['Num Units Traded'], label=f"Units Traded (S{session_number} E{episode_num})", color=color_use)
             ax_combined.set_ylabel('Units Traded', fontsize=9)
             ax_combined.set_title(f'{ticker} | Num Units Traded and Cumulative Reward', fontsize=10)
             ax_combined.legend(loc='upper left', framealpha=0.5)
 
             ax_cr = ax_combined.twinx()
-            ax_cr.plot(state_log_df['Date'], state_log_df['Cumulative Reward'], label=f'Cumulative Reward (S{session_number} E{episode_num})', color=color, linestyle='--')
+            ax_cr.plot(state_log_df['Date'], state_log_df['Cumulative Reward'], label=f'Cumulative Reward (S{session_number} E{episode_num})', color=color_use, linestyle='--')
             ax_cr.set_ylabel('Cumulative Reward', fontsize=9)
             ax_cr.set_ylim([min_cumulative_reward, max_cumulative_reward])
             # Adjusting both legends to be in the lower right with different vertical offsets
@@ -697,15 +708,75 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
 
             # Plot Periods
             ax_periods = axs[-1]
-            ax_periods.plot(state_log_df['Date'], state_log_df['Period'], label=f"Period (S{session_number} E{episode_num})", color=color)
-            ax_periods.plot(state_log_df['Date'], state_log_df['Exit Period'], label=f"Exit Period (S{session_number} E{episode_num})", linestyle='--', color=color)
+            ax_periods.plot(state_log_df['Date'], state_log_df['Period'], label=f"Period (S{session_number} E{episode_num})", color=color_use)
+            ax_periods.plot(state_log_df['Date'], state_log_df['Exit Period'], label=f"Exit Period (S{session_number} E{episode_num})", linestyle='--', color=color_use)
             ax_periods.set_title('Period and Exit Period over Time', fontsize=10)
             ax_periods.set_xlabel('Date', fontsize=9)
             ax_periods.set_ylabel('Period Values', fontsize=9)
             ax_periods.legend(framealpha=0.5)
+            
+            if not is_first:
+                reward_sums_all.append(state_log_df['Cumulative Reward'].values)
+                total_values_all.append(state_log_df['Total Value'].values)
+                total_equities_all.append(state_log_df['Account Total Equity'].values)
+                num_units_all.append(state_log_df['Num Units Traded'].values)
+                periods_all.append(state_log_df['Period'].values)
+                exit_peiods_all.append(state_log_df['Exit Period'].values)
+        
+        is_first = False
 
     # Adjust layout to avoid overlaps and make the plot look neat
     plt.tight_layout(pad=0.4, w_pad=0.5, h_pad=1.0)
+    
+    
+    if len(episode_nums2) > 1:
+        color_use = colors[color_index]
+        metric = 'Account Total Equity'
+                
+        mean_total_equites = np.sum(total_equities_all, axis=0) / len(total_equities_all)
+        
+        axs[1].plot(state_log_df['Date'], mean_total_equites, label=f"{metric} Session {session_number} Episode Average", color=color_use)
+        axs[1].set_title(f"{ticker} | {metric} over Time", fontsize=10)
+        axs[1].set_xlabel('Date', fontsize=9)
+        axs[1].set_ylabel('Price', fontsize=9)
+        axs[1].legend(framealpha=0.5, loc='upper left')
+        
+        mean_total_values = np.sum(total_values_all, axis=0) / len(total_values_all)
+        
+        ax_tv = axs[-3]
+        ax_tv.plot(state_log_df['Date'], mean_total_values, label=f"Total Value (S{session_number} Episode Average", color=color_use)
+        ax_tv.set_title(f'{ticker} | Total Value and Exploration Rate', fontsize=10)
+        ax_tv.set_xlabel('Date', fontsize=9)
+        ax_tv.set_ylabel('Total Value', fontsize=9)
+        ax_tv.legend(loc='upper left', framealpha=0.5)
+        
+        mean_units_traded = np.sum(num_units_all, axis=0) / len(num_units_all)
+        
+        ax_combined = axs[-2]
+        ax_combined.plot(state_log_df['Date'], mean_units_traded, label=f"Units Traded (S{session_number} E{episode_num})", color=color_use)
+        ax_combined.set_ylabel('Units Traded', fontsize=9)
+        ax_combined.set_title(f'{ticker} | Num Units Traded and Cumulative Reward', fontsize=10)
+        ax_combined.legend(loc='upper left', framealpha=0.5)
+        
+        mean_cumulative_rewards = np.sum(reward_sums_all, axis=0) / len(reward_sums_all)
+        
+        ax_cr = ax_combined.twinx()
+        ax_cr.plot(state_log_df['Date'], mean_cumulative_rewards, label=f'Cumulative Reward (S{session_number} E{episode_num})', color=color_use, linestyle='--')
+        ax_cr.set_ylabel('Cumulative Reward', fontsize=9)
+        ax_cr.set_ylim([min_cumulative_reward, max_cumulative_reward])
+        ax_cr.legend(loc='lower right', bbox_to_anchor=(1, 0.4), framealpha=0.5)
+        
+        mean_periods = np.sum(periods_all, axis=0) / len(periods_all)
+        mean_exit_periods = np.sum(exit_peiods_all, axis=0) / len(exit_peiods_all)
+
+        ax_periods = axs[-1]
+        ax_periods.plot(state_log_df['Date'], mean_periods, label=f"Period (S{session_number} E{episode_num})", color=color_use)
+        ax_periods.plot(state_log_df['Date'], mean_exit_periods, label=f"Exit Period (S{session_number} E{episode_num})", linestyle='--', color=color_use)
+        ax_periods.set_title('Period and Exit Period over Time', fontsize=10)
+        ax_periods.set_xlabel('Date', fontsize=9)
+        ax_periods.set_ylabel('Period Values', fontsize=9)
+        ax_periods.legend(framealpha=0.5)
+    
     
     if len(episode_nums1) == 1:
         results_directory = os.path.join('analysis_results', 'state_graphs')
@@ -716,6 +787,7 @@ def plot_state_history_comparison(session_number1, session_number2, episode_nums
         plot_name = f"{ticker}_ep_{episode_nums1[0]}_vs_{episode_nums2_joined}.png"
 
         plt.savefig(os.path.join(results_directory, plot_name))
+        
         
     plt.show()
     
