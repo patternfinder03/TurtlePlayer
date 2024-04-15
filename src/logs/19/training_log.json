@@ -2,7 +2,7 @@
     "agent_type": "BaseAgent",
     "training_results": {
         "rewards": [
-            965.8200000000242
+            964.137000000025
         ],
         "final_periods": [
             20
@@ -14,16 +14,16 @@
             20
         ],
         "total_pnl_percents": [
-            511.17847359308075
+            1443.4000061573975
         ],
         "total_pnls": [
-            309030.2375329976
+            1112143.89868
         ],
         "exploration_rates": [
             0
         ],
         "units_traded": [
-            456
+            481
         ]
     }
 }

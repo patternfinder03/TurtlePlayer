@@ -26,12 +26,10 @@ Log Notes:
 14. Coke DQN
 15. Chevron Base
 16. Chevron DQN
-17. Tesla Base
-18. Tesla DQN
-19. Google Base
-20. Google DQN
-21. Amazon Base
-22. Amazon DQN
+17. Google Base
+18. Google DQN
+19. Amazon Base
+20. Amazon DQN
 """
 
 # CRITICAL CRITCAL CRITICAL CRITICAL CRITICAL CRITICAL CRITICAL CRITICAL CRITICAL
