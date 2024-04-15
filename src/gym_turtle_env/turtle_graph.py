@@ -3,7 +3,7 @@ import time
 import pygame
 import imageio 
 
-save_gif = False
+save_gif = True
 
 class TurtleStockGraph:
     """

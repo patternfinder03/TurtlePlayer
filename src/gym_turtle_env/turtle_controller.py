@@ -11,7 +11,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from typing import List, Tuple, Union
 from price_movement.actual.actual_price_getter import TurtleActualPriceGetter
 
-save_graph = False
+save_graph = True
 class TurtleController:
     """
     The Controller class manages the interaction between the turtle trading environment and an agent.
@@ -110,7 +110,7 @@ class TurtleController:
             self.trader.close_all_positions()
             self._get_next_price()   
             if save_graph:
-                self.graph.save_as_gif('test2.gif', duration=.3)                   # Returns True for done
+                self.graph.save_as_gif('test2.gif', duration=.1)                   # Returns True for done
             return self.get_state(), self.get_reward(is_complete=True), True, False, self.get_info()
 
     def _get_next_price(self):

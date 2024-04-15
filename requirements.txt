@@ -6,3 +6,4 @@ torch
 tabulate
 matplotlib
 pygame
+imageio
