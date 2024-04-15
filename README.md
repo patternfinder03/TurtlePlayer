@@ -145,7 +145,7 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 | DQN_Average | 2014-02-24   | 2015-02-20 | -0.09%        |    30.64 |
 | DQN_Average | 2018-03-09   | 2019-03-08 | -0.10%        |    30.19 |
 
-![Alt text](/src/analysis_results/state_graphs/F_ep_1_vs_96_72.png)
+![Alt text](/src/analysis_results/state_graphs/CVX_ep_1_vs_34_87.png)
 
 ### AMZN Performance Results
 
