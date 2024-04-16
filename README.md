@@ -3,7 +3,7 @@
 TurtlePlayer is a reinforcement learning framework designed for financial trading strategies using the Turtle Trading system. It differs from most RL traders in that the action space isn't correlated with buying, selling, and holding actions. Instead, the action space adjusts the lookback period for entries and exits. The 
 type 1 turtle strategy enters when a close exceeds yesterday's 20 day high and exits when the close price is below yesterday's 10 day's low. Turtle Player can dynamically adjust these periods. Feel free to modify the parameters in config.py to make your own turtle traders.
 
-## Description
+# Description
 
 At its core, Turtle Player is designed to experiment with Reinforcement Learning (RL) in trading where the action space isn't associated with buying or selling. As the turtle trading strategy and basically all variations of it have been priced in, it is highly unlikely that turtle player will be able to generate competitive returns.
 
@@ -11,7 +11,7 @@ Turtle Player is built using Gymnasium and PyTorch for RL and NN training, Panda
 
 ![Alt text](src/analysis_results/msft_dqn.gif "Optional title")
 
-## Installation Guide
+# Installation Guide
 
 Follow these steps to get TurtlePlayer up and running on your system:
 
@@ -51,7 +51,7 @@ pip install -r requirements.txt
 cd src
 ```
 
-## Configuration and running guide
+# Configuration and running guide
 
 Open the code in an editor like VSCode
 
@@ -81,48 +81,69 @@ python analyze.py --type train --session1 2
 python analyze.py --type performance --session1 1 --session2 2 # For this a Base agent session must always be fist
 ```
 
-## Reward function
+# Reward function
 
 
+## Part 1: Turtle solver
 
-**Distance to Ideal Window**
+The Turtle Solver is implemented to analyze completed trades and determine optimal actions for each timestep during the trade and provide addtional metadata for the reward function.
+
+After a trade is closed, the Turtle Solver retrospects through each timestep of the trade to identify what the optimal actions could have been, based on available data. 
+
+### Actions Analyzed
+For each timestep, the Turtle Solver identifies one of the following optimal actions:
+- **BuyRange (Able to buy)**: Indicates that buying at this timestep is possible and optimal given the turtle parameters.
+- **AvoidBuyRange (Able to avoid buying)**: Indicates that avoiding a buy at this timestep is possible and optimal given the turtle parameters.
+- **ForcedBuy (Unable to avoid buying)**: Denotes situations where buying was unavoidable given the turtle parameters.
+- **CantBuy (Unable to buy)**: Denotes situation where we want to buy, but it is impossible given the turtle parameters.
+
+### Optimal Window Range
+The solver calculates an 'optimal window range' for each timestep, defined by minimum and maximum values (e.g., `min = 15`, `max = 35`). This range indicates where the trader's entry period should ideally fall to align with the best action identified.
+
+### Smoothed Ideal Calculation
+A 'smoothed ideal' is also calculated for each timestep as a weighted average of the `min` and `max` values, typically using weights of 0.2 and 0.8, respectively. This figure represents a target or ideal value that combines insights from the range boundaries with a bias towards the `max` value, suggesting a more aggressive trading stance within the optimal range.
+
+### Output
+The Turtle Solver outputs a list of data for each timestep, which includes the optimal actions, the optimal window range, and the smoothed ideal. This data is subsequently utilized to calculate rewards.
+
+
+## 2. Reward Calculation
+
+### For each element in list provided from turtle solver:
+
+**1a. Reward for Being Inside the Optimal Range**
+
 $$d_{\mathrm{ideal}} = |\mathrm{agent\_window} - \mathrm{smoothed\_ideal}|$$
 
-
-
-
-**Reward for Being Inside the Optimal Range**
 $$\mathrm{base\_reward} = 0.75 \times \left(1 - \frac{d_{\mathrm{ideal}}}{\max(\mathrm{solver\_window}['\mathrm{max}'] - \mathrm{solver\_window}['\mathrm{min}'], 1)}\right)$$
 
 
-$$
-\mathrm{base\_penalty} = -0.5 \times \left(1 - \frac{1}{\max \left(\frac{1}{\log \left(\max \left(\mathrm{solver\_window}['\mathrm{max}'] - \mathrm{solver\_window}['\mathrm{min}'], 2 \right)\right)}, 1 \right)}\right)
-$$
+**1b. Penalty for Being Inside the Optimal Range**
+$$\mathrm{base\_penalty} = -0.5 \times \left(1 - \frac{1}{\max \left(\frac{1}{\log \left(\max \left(\mathrm{solver\_window}['\mathrm{max}'] - \mathrm{solver\_window}['\mathrm{min}'], 2 \right)\right)}, 1 \right)}\right)$$
 
 
-$$
-\begin{cases}
+**2. Reward and Penalty scaling**
+$$\begin{cases}
 \mathrm{base\_reward} \times 0.55 & \text{if transition approaching and ForcedBuy or CantBuy} \\
 \mathrm{base\_reward} \times 0.3 & \text{if not transition approaching and ForcedBuy or CantBuy} \\
-\mathrm{base\_penalty} \times 1.15 & \text{if not in BuyRange or AvoidBuyRange} \\
-\mathrm{base\_penalty} \times 1.75 & \text{otherwise}
+\mathrm{base\_penalty} \times 1.15 & \text{if optimal action not in BuyRange or AvoidBuyRange and transition approaching} \\
+\mathrm{base\_penalty} \times 1.75 & \text{if optimal action in BuyRange or AvoidbuyRange}
 \end{cases}
 $$
 
-$$
-\begin{cases}
-+0.15 & \mathrm{if (agent\_window > smoothed\ ideal \ and \ agent\_action = 'Decrease') or (agent\_window < smoothed\_ideal \ and \ agent\_action = 'Increase')} \\
-+0.075 & \mathrm{if agent\_action = 'Nothing'} \\
--0.15 & \mathrm{if moving away from the ideal} \\
-+0.2 & \mathrm{if (agent\_window < min \ and \ agent\_action = 'Increase') or (agent\_window > max \ and \ agent\_action = 'Decrease')} \\
--0.2 & \mathrm{if \ moving \ away \ from \ the \ range}
-\end{cases}
-$$
+**3. Additional bonuses and penalties**
+$$\begin{cases}
+\mathrm{base\_reward}+0.15 & \mathrm{if (agent\_window > smoothed\ ideal \ and \ agent\_action = 'Decrease') or (agent\_window < smoothed\_ideal \ and \ agent\_action = 'Increase')} \\
+\mathrm{base\_reward}+0.075 & \mathrm{if agent\_action = 'Nothing'} \\
+\mathrm{base\_reward}-0.15 & \mathrm{if \ moving \ away \ from \ the \ ideal} \\
+\mathrm{base\_penalty}+0.2 & \mathrm{if (agent\_window < min \ and \ agent\_action = 'Increase') or (agent\_window > max \ and \ agent\_action = 'Decrease')} \\
+\mathrm{base\_penalty}-0.2 & \mathrm{if \ moving \ away \ from \ the \ range}
+\end{cases}$$
 
 
 
-$$
-R = \mathrm{base\_reward} \ or \ \mathrm{base\_penalty} \ adjusted + \mathrm{action-based} \ adjustments
+**5. Final reward for element**
+$$R = \mathrm{base\_reward} \ or \ \mathrm{base\_penalty} \ adjusted + \mathrm{action-based} \ adjustments
 $$
 
 
