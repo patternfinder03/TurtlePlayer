@@ -87,6 +87,7 @@ $$
 d_{\text{ideal}} = |\text{agent\_window} - \text{smoothed\_ideal}|
 $$
 
+
 $$
 \text{base\_reward} = 0.75 \times \left(1 - \frac{d_{\text{ideal}}}{\max(\text{solver\_window}['\text{max}'] - \text{solver\_window}['\text{min}'], 1)}\right)
 $$
