@@ -91,38 +91,45 @@ $$d_{\mathrm{ideal}} = |\mathrm{agent\_window} - \mathrm{smoothed\_ideal}|$$
 
 
 
+**Reward for Being Inside the Optimal Range**
 $$
-\text{base\_reward} = 0.75 \times \left(1 - \frac{d_{\text{ideal}}}{\max(\text{solver\_window}['\text{max}'] - \text{solver\_window}['\text{min}'], 1)}\right)
+\mathrm{base\_reward} = 0.75 \times \left(1 - \frac{d_{\mathrm{ideal}}}{\max(\mathrm{solver\_window}['\mathrm{max}'] - \mathrm{solver\_window}['\mathrm{min}'], 1)}\right)
 $$
 
 
 $$
-\text{base\_penalty} = -0.5 \times \left(1 - \frac{1}{\max \left(\frac{1}{\log \left(\max \left(\text{solver\_window}['\text{max}'] - \text{solver\_window}['\text{min}'], 2 \right)\right)}, 1 \right)}\right)
+\mathrm{base\_penalty} = -0.5 \times \left(1 - \frac{1}{\max \left(\frac{1}{\log \left(\max \left(\mathrm{solver\_window}['\mathrm{max}'] - \mathrm{solver\_window}['\mathrm{min}'], 2 \right)\right)}, 1 \right)}\right)
 $$
+
 
 $$
 \begin{cases} 
-\text{base\_reward} \times= 0.55 & \text{if transition\_approaching and (solver\_window['optimal\_action'] \ in \ ['BAD\_ForcedBuy', 'BAD\_CantBuy'])} \\
-\text{base\_reward} \times= 0.3 & \text{if not transition\_approaching and (solver\_window['optimal\_action'] \ in \ ['BAD\_ForcedBuy', 'BAD\_CantBuy'])} \\
-\text{base\_penalty} \times= 1.15 & \text{if not \ in \ ['BuyRange', 'AvoidBuyRange']} \\
-\text{base\_penalty} \times= 1.75 & \text{otherwise}
+\mathrm{base\_reward} \times= 0.55 & \text{if transition approaching and } \text{(solver\_window['optimal\_action'] \ in \ ['BAD\_ForcedBuy', 'BAD\_CantBuy'])} \\
+\mathrm{base\_reward} \times= 0.3 & \text{if not transition approaching and } \text{(solver\_window['optimal\_action'] \ in \ ['BAD\_ForcedBuy', 'BAD\_CantBuy'])} \\
+\mathrm{base\_penalty} \times= 1.15 & \text{if not in ['BuyRange', 'AvoidBuyRange']} \\
+\mathrm{base\_penalty} \times= 1.75 & \text{otherwise}
 \end{cases}
 $$
 
 
+
+
 $$
 \begin{cases} 
-+0.15 & \text{if (agent\_window > smoothed\_ideal \ and \ agent\_action == 'Decrease') or (agent\_window < smoothed\_ideal \ and \ agent\_action == 'Increase')} \\
-+0.075 & \text{if agent\_action == 'Nothing'} \\
++0.15 & \text{if (\mathrm{agent\_window} > \mathrm{smoothed\_ideal} \ and \ \mathrm{agent\_action} == 'Decrease') or (\mathrm{agent\_window} < \mathrm{smoothed\_ideal} \ and \ \mathrm{agent\_action} == 'Increase')} \\
++0.075 & \text{if \mathrm{agent\_action} == 'Nothing'} \\
 -0.15 & \text{if moving away from the ideal} \\
-+0.2 & \text{if (agent\_window < min \ and \ agent\_action == 'Increase') or (agent\_window > max \ and \ agent\_action == 'Decrease')} \\
++0.2 & \text{if (\mathrm{agent\_window} < \mathrm{min} \ and \ \mathrm{agent\_action} == 'Increase') or (\mathrm{agent\_window} > \mathrm{max} \ and \ \mathrm{agent\_action} == 'Decrease')} \\
 -0.2 & \text{if moving away from the range}
 \end{cases}
 $$
 
+
+
 $$
-R = \text{base\_reward or base\_penalty adjusted} + \text{action-based adjustments}
+R = \mathrm{base\_reward} \ or \ \mathrm{base\_penalty} \ adjusted + \mathrm{action-based} \ adjustments
 $$
+
 
 
 
