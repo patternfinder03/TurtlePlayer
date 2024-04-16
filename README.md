@@ -83,11 +83,11 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 
 ## Reward function
 
-**The Cauchy-Schwarz Inequality**
-$$\left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)$$
+
 
 **Distance to Ideal Window**
-$$d_{\text{ideal}} = |\text{agent\_window} - \text{smoothed\_ideal}|$$
+$$d_{\mathrm{ideal}} = |\mathrm{agent\_window} - \mathrm{smoothed\_ideal}|$$
+
 
 
 
