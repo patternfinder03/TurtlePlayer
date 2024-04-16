@@ -1,11 +1,11 @@
 # TurtlePlayer
 
 TurtlePlayer is a reinforcement learning framework designed for financial trading strategies using the Turtle Trading system. It differs from most RL traders in that the action space isn't correlated with buying, selling, and holding actions. Instead, the action space adjusts the lookback period for entries and exits. The 
-type 1 turtle strategy enters when a close exceeds the previous day's 20 day high and exits when the close price is below the previous 10 day's low. Turtle Player can dynamically adjust these periods. Feel free to modify the parameters in config.py to make your own turtle traders.
+type 1 turtle strategy enters when a close exceeds yesterday's 20 day high and exits when the close price is below yesterday's 10 day's low. Turtle Player can dynamically adjust these periods. Feel free to modify the parameters in config.py to make your own turtle traders.
 
 ## Description
 
-At its core, Turtle Player is designed to experiment with RL in trading where the action space isn't associated with buying or selling. As the turtle trading strategy and basically all variations of it have been priced in, it is highly unlikely that turtle player will be able to generate competitive returns.
+At its core, Turtle Player is designed to experiment with Reinforcement Learning (RL) in trading where the action space isn't associated with buying or selling. As the turtle trading strategy and basically all variations of it have been priced in, it is highly unlikely that turtle player will be able to generate competitive returns.
 
 Turtle Player is built using Gymnasium and PyTorch for RL and NN training, Pandas and Numpy for data loading and manipulation, and Matplotlib, tabulate, and imageio for analysis.
 
@@ -80,6 +80,47 @@ python analyze.py --type trade --session1 2
 python analyze.py --type train --session1 2
 python analyze.py --type performance --session1 1 --session2 2 # For this a Base agent session must always be fist
 ```
+
+## Reward function
+
+$$
+d_{\text{ideal}} = |\text{agent\_window} - \text{smoothed\_ideal}|
+$$
+
+$$
+\text{base\_reward} = 0.75 \times \left(1 - \frac{d_{\text{ideal}}}{\max(\text{solver\_window}['\text{max}'] - \text{solver\_window}['\text{min}'], 1)}\right)
+$$
+
+
+$$
+\text{base\_penalty} = -0.5 \times \left(1 - \frac{1}{\max \left(\frac{1}{\log \left(\max \left(\text{solver\_window}['\text{max}'] - \text{solver\_window}['\text{min}'], 2 \right)\right)}, 1 \right)}\right)
+$$
+
+$$
+\begin{cases} 
+\text{base\_reward} \times= 0.55 & \text{if transition\_approaching and (solver\_window['optimal\_action'] \ in \ ['BAD\_ForcedBuy', 'BAD\_CantBuy'])} \\
+\text{base\_reward} \times= 0.3 & \text{if not transition\_approaching and (solver\_window['optimal\_action'] \ in \ ['BAD\_ForcedBuy', 'BAD\_CantBuy'])} \\
+\text{base\_penalty} \times= 1.15 & \text{if not \ in \ ['BuyRange', 'AvoidBuyRange']} \\
+\text{base\_penalty} \times= 1.75 & \text{otherwise}
+\end{cases}
+$$
+
+
+$$
+\begin{cases} 
++0.15 & \text{if (agent\_window > smoothed\_ideal \ and \ agent\_action == 'Decrease') or (agent\_window < smoothed\_ideal \ and \ agent\_action == 'Increase')} \\
++0.075 & \text{if agent\_action == 'Nothing'} \\
+-0.15 & \text{if moving away from the ideal} \\
++0.2 & \text{if (agent\_window < min \ and \ agent\_action == 'Increase') or (agent\_window > max \ and \ agent\_action == 'Decrease')} \\
+-0.2 & \text{if moving away from the range}
+\end{cases}
+$$
+
+$$
+R = \text{base\_reward or base\_penalty adjusted} + \text{action-based adjustments}
+$$
+
+
 
 
 # Actual results

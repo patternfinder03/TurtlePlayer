@@ -3,7 +3,7 @@ import time
 import pygame
 import imageio 
 
-save_gif = True
+save_gif = False
 
 class TurtleStockGraph:
     """
@@ -48,7 +48,7 @@ class TurtleStockGraph:
         except:
             time.sleep(1)
 
-    def update_graph(self, prices, actions, rolling_high, rolling_low, directions, date):
+    def update_graph(self, prices, actions, rolling_high, rolling_low, directions, date, current_entry, current_exit):
         """
         Updates the graph with prices, actions, rolling highs, and rolling lows.
         It colors the rolling highs based on the action taken.
@@ -117,6 +117,15 @@ class TurtleStockGraph:
                 x, y = self._calculate_coordinates(i, price, min_price, max_price, len(prices))
                 color = self.colors[action]
                 pygame.draw.circle(self.screen, color, (int(x), int(y)), 5)
+                
+        entry_text = self.font.render(f"Entry Period: {current_entry}", True, (255, 255, 255))  # Yellow text
+        entry_position = (self.width - entry_text.get_width() - 10, 10)  # Top-right corner
+        self.screen.blit(entry_text, entry_position)
+
+        # Display current exit period in the bottom right
+        exit_text = self.font.render(f"Exit Period: {current_exit}", True, (255, 255, 255))  # Cyan text
+        exit_position = (self.width - exit_text.get_width() - 10, self.height - 30)  # Bottom-right corner
+        self.screen.blit(exit_text, exit_position)
 
         self._draw_legend()
         pygame.display.flip()

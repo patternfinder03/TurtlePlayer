@@ -11,7 +11,7 @@ from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from typing import List, Tuple, Union
 from price_movement.actual.actual_price_getter import TurtleActualPriceGetter
 
-save_graph = True
+save_graph = False
 class TurtleController:
     """
     The Controller class manages the interaction between the turtle trading environment and an agent.
@@ -188,7 +188,7 @@ class TurtleController:
         if len(self.trader.action_list) > 1:
             self.graph.screen.fill(self.graph.background_color)
             if len(self.trader.close_price_list) > len(self.trader.action_list):
-                self.graph.update_graph(self.trader.close_price_list[:-1], self.trader.trade_action_list, self.trader.rolling_high_list[:-1], self.trader.rolling_low_list[:-1],self.trader.action_list, str(self.trader.dates[-1])[0:4])
+                self.graph.update_graph(self.trader.close_price_list[:-1], self.trader.trade_action_list, self.trader.rolling_high_list[:-1], self.trader.rolling_low_list[:-1],self.trader.action_list, str(self.trader.dates[-1])[0:4], self.trader.period_list[-1], self.trader.exit_period_list[-1])
             else:
                 raise ValueError("Given implementation shouldn't be here. Close Price list and Action list should be the same length")
             
