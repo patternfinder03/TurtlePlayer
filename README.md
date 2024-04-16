@@ -101,7 +101,7 @@ For each timestep, the Turtle Solver identifies one of the following optimal act
 The solver calculates an 'optimal window range' for each timestep, defined by minimum and maximum values (e.g., `min = 15`, `max = 35`). This range indicates where the trader's entry period should ideally fall to align with the best action identified.
 
 ### Smoothed Ideal Calculation
-A 'smoothed ideal' is also calculated for each timestep as a weighted average of the `min` and `max` values, typically using weights of 0.2 and 0.8, respectively. This figure represents a target or ideal value that combines insights from the range boundaries with a bias towards the `max` value, suggesting a more aggressive trading stance within the optimal range.
+A 'smoothed ideal' is also calculated for each timestep as a weighted average of the `min` and `max` values, typically using weights of 0.2 and 0.8, respectively. This figure represents a target or ideal value that combines insights from the range boundaries with a bias towards the `max` value.
 
 ### Output
 The Turtle Solver outputs a list of data for each timestep, which includes the optimal actions, the optimal window range, and the smoothed ideal. This data is subsequently utilized to calculate rewards.
@@ -122,16 +122,13 @@ $$\mathrm{base\_reward} = 0.75 \times \left(1 - \frac{d_{\mathrm{ideal}}}{\max(\
 $$\mathrm{base\_penalty} = -0.5 \times \left(1 - \frac{1}{\max \left(\frac{1}{\log \left(\max \left(\mathrm{solver\_window}['\mathrm{max}'] - \mathrm{solver\_window}['\mathrm{min}'], 2 \right)\right)}, 1 \right)}\right)$$
 
 
-**2. Reward and Penalty scaling**
 $$\begin{cases}
 \mathrm{base\_reward} \times 0.55 & \text{if transition approaching and ForcedBuy or CantBuy} \\
 \mathrm{base\_reward} \times 0.3 & \text{if not transition approaching and ForcedBuy or CantBuy} \\
 \mathrm{base\_penalty} \times 1.15 & \text{if optimal action not in BuyRange or AvoidBuyRange and transition approaching} \\
 \mathrm{base\_penalty} \times 1.75 & \text{if optimal action in BuyRange or AvoidbuyRange}
-\end{cases}
-$$
+\end{cases}$$
 
-**3. Additional bonuses and penalties**
 $$\begin{cases}
 \mathrm{base\_reward}+0.15 & \mathrm{if (agent\_window > smoothed\ ideal \ and \ agent\_action = 'Decrease') or (agent\_window < smoothed\_ideal \ and \ agent\_action = 'Increase')} \\
 \mathrm{base\_reward}+0.075 & \mathrm{if agent\_action = 'Nothing'} \\
