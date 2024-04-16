@@ -122,7 +122,7 @@ $$\mathrm{base\_reward} = 0.75 \times \left(1 - \frac{d_{\mathrm{ideal}}}{\max(\
 $$\mathrm{base\_penalty} = -0.5 \times \left(1 - \frac{1}{\max \left(\frac{1}{\log \left(\max \left(\mathrm{solver\_window}['\mathrm{max}'] - \mathrm{solver\_window}['\mathrm{min}'], 2 \right)\right)}, 1 \right)}\right)$$
 
 
-Reward and penalty scaling
+
 $$
 \begin{cases}
 \mathrm{base\_reward} \times 0.55 & \mathrm{if \ transition \ approaching \ and \ (ForcedBuy \ or \ CantBuy)} \\
@@ -132,7 +132,6 @@ $$
 \end{cases}
 $$
 
-Additional penalties and bonuses
 $$
 \begin{cases}
 \mathrm{base\_reward} + 0.15 & \mathrm{if \ (agent\_window > smoothed\_ideal \ and \ agent\_action = 'Decrease') \ or \ (agent\_window < smoothed\_ideal \ and \ agent\_action = 'Increase')} \\
