@@ -83,9 +83,8 @@ python analyze.py --type performance --session1 1 --session2 2 # For this a Base
 
 ## Reward function
 
-$$
-d_{\text{ideal}} = |\text{agent\_window} - \text{smoothed\_ideal}|
-$$
+**Test**
+$$d_{\text{ideal}} = |\text{agent\_window} - \text{smoothed\_ideal}|$$
 
 
 $$
