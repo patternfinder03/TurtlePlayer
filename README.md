@@ -102,25 +102,22 @@ $$
 
 $$
 \begin{cases}
-\text{base\_reward} \times 0.55 & \text{if transition approaching and BAD\_ForcedBuy or BAD\_CantBuy} \\
-\text{base\_reward} \times 0.3 & \text{if not transition approaching and BAD\_ForcedBuy or BAD\_CantBuy} \\
-\text{base\_penalty} \times 1.15 & \text{if not in BuyRange or AvoidBuyRange} \\
-\text{base\_penalty} \times 1.75 & \text{otherwise}
+\mathrm{base\_reward} \times 0.55 & \text{if transition approaching and ForcedBuy or CantBuy} \\
+\mathrm{base\_reward} \times 0.3 & \text{if not transition approaching and ForcedBuy or CantBuy} \\
+\mathrm{base\_penalty} \times 1.15 & \text{if not in BuyRange or AvoidBuyRange} \\
+\mathrm{base\_penalty} \times 1.75 & \text{otherwise}
 \end{cases}
 $$
-
-
 
 $$
 \begin{cases}
-+0.15 & \text{if agent\ window > smoothed\ ideal and agent\ action = Decrease, or agent\ window < smoothed\ ideal and agent\ action = Increase} \\
-+0.075 & \text{if agent\ action = Nothing} \\
++0.15 & \text{if (agent\_window > smoothed\ ideal \ and \ agent\_action = 'Decrease') or (agent\_window < smoothed\_ideal \ and \ agent\_action = 'Increase')} \\
++0.075 & \text{if agent\_action = 'Nothing'} \\
 -0.15 & \text{if moving away from the ideal} \\
-+0.2 & \text{if agent\ window < min and agent\ action = Increase, or agent\ window > max and agent\ action = Decrease} \\
++0.2 & \text{if (agent\_window < min \ and \ agent\_action = 'Increase') or (agent\_window > max \ and \ agent\_action = 'Decrease')} \\
 -0.2 & \text{if moving away from the range}
 \end{cases}
 $$
-
 
 
 
