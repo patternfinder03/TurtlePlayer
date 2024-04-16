@@ -128,7 +128,7 @@ $$
 \mathrm{base\_reward} \times 0.55 & \mathrm{if \ transition \ approaching \ and \ (ForcedBuy \ or \ CantBuy)} \\
 \mathrm{base\_reward} \times 0.3 & \mathrm{if \ not \ transition \ approaching \ and \ (ForcedBuy \ or \ CantBuy)} \\
 \mathrm{base\_penalty} \times 1.15 & \mathrm{if \ optimal \ action \ not \ in \ (BuyRange \ or \ AvoidBuyRange) \ and \ transition \ approaching} \\
-\mathrm{base\_penalty} \times 1.75 & \mathrm{if \ optimal \ action \ in \ (BuyRange \ or \ AvoidBuyRange)}
+\mathrm{base\_penalty} \times 1.75 & \mathrm{if \ optimal \ action \ in \ (BuyRange \ or \ AvoidBuyRange)                            }
 \end{cases}
 $$
 
@@ -146,7 +146,7 @@ $$
 
 
 **5. Final reward for element**
-$$R = \mathrm{base\_reward} \ or \ \mathrm{base\_penalty} \ adjusted + \mathrm{action-based} \ adjustments
+$$Reward = \mathrm{base\_reward} \ or \ \mathrm{base\_penalty}
 $$
 
 
