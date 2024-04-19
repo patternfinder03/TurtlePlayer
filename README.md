@@ -126,7 +126,7 @@ $$\mathrm{base\_penalty} = -0.5 \times \left(1 - \frac{1}{\max \left(\frac{1}{\l
 $$
 \begin{cases}
 \mathrm{base\_reward} \times 0.55 & \mathrm{if \ transition \ approaching \ and \ (ForcedBuy \ or \ CantBuy)} \\
-\mathrm{base\_reward} \times 0.3 & \mathrm{if \ not \ transition \ approaching \ and \ (ForcedBuy \ or \ CantBuy)} \\
+\mathrm{base\_reward} \times 0.3 & \mathrm{if \ not \ transition \ approaching \ and \ (ForcedBuy \ or \ CantBuy TEST to see if longer text will adjust the formatting blah blah blah blah blahblahbalbla)} \\
 \mathrm{base\_penalty} \times 1.15 & \mathrm{if \ optimal \ action \ not \ in \ (BuyRange \ or \ AvoidBuyRange) \ and \ transition \ approaching} \\
 \mathrm{base\_penalty} \times 1.75 & \mathrm{if \ optimal \ action \ in \ (BuyRange \ or \ AvoidBuyRange)                            }
 \end{cases}
@@ -156,6 +156,8 @@ $$
 # Actual results
 
 ## Performance result tables (comparing Base Turtle and TurtlePlayer when exploration rate == 0) and graphs.
+
+### Orange represents best turtle trader from training epiosdes, Red represents worst turtle trader from training episodes, Green represents average turtle trader from training epiosdes, and Blue represents the base turtle trader
 
 
 ### F Performance Results
