@@ -103,6 +103,10 @@ The solver calculates an 'optimal window range' for each timestep, defined by mi
 ### Smoothed Ideal Calculation
 A 'smoothed ideal' is also calculated for each timestep as a weighted average of the `min` and `max` values, typically using weights of 0.2 and 0.8, respectively. This figure represents a target or ideal value that combines insights from the range boundaries with a bias towards the `max` value.
 
+
+### Transition Approaching Calculation
+A 'transition approaching' is calculated for each time step if the 'optimal action' in [CantBuy or ForcedBuy] and an 'optimal action' in [BuyRange or AvoidBuyRange] within the next 5 time steps 
+
 ### Output
 The Turtle Solver outputs a list of data for each timestep, which includes the optimal actions, the optimal window range, and the smoothed ideal. This data is subsequently utilized to calculate rewards.
 
@@ -125,20 +129,22 @@ $$\mathrm{base\_penalty} = -0.5 \times \left(1 - \frac{1}{\max \left(\frac{1}{\l
 
 $$
 \begin{cases}
-\mathrm{base\_reward} \times 0.55 & \mathrm{if \ transition \ approaching \ and \ (ForcedBuy \ or \ CantBuy)} \\
-\mathrm{base\_reward} \times 0.3 & \mathrm{if \ not \ transition \ approaching \ and \ (ForcedBuy \ or \ CantBuy TEST to see if longer text will adjust the formatting blah blah blah blah blahblahbalbla)} \\
-\mathrm{base\_penalty} \times 1.15 & \mathrm{if \ optimal \ action \ not \ in \ (BuyRange \ or \ AvoidBuyRange) \ and \ transition \ approaching} \\
-\mathrm{base\_penalty} \times 1.75 & \mathrm{if \ optimal \ action \ in \ (BuyRange \ or \ AvoidBuyRange)                            }
+\mathrm{base\_reward} \times= 0.55 & \mathrm{if \ 'transition \ approaching' \ and \ 'optimal \ action' \ in \ (ForcedBuy \ or \ CantBuy)} \\
+\mathrm{base\_reward} \times= 0.3 & \mathrm{if \ not \ 'transition \ approaching' \ and \ (ForcedBuy \ or \ CantBuy)} \\
+\mathrm{base\_penalty} \times= 1.15 & \mathrm{if \ optimal \ action \ not \ in \ (BuyRange \ or \ AvoidBuyRange) \ and \ 'transition \ approaching'} \\
+\mathrm{base\_penalty} \times= 1.75 & \mathrm{if \ optimal \ action \ in \ (BuyRange \ or \ AvoidBuyRange)                            }
 \end{cases}
 $$
 
 $$
 \begin{cases}
-\mathrm{base\_reward} + 0.15 & \mathrm{if \ (agent\_window > smoothed\_ideal \ and \ agent\_action = 'Decrease') \ or \ (agent\_window < smoothed\_ideal \ and \ agent\_action = 'Increase')} \\
-\mathrm{base\_reward} + 0.075 & \mathrm{if \ agent\_action = 'Nothing'} \\
-\mathrm{base\_reward} - 0.15 & \mathrm{if \ moving \ away \ from \ the \ ideal} \\
-\mathrm{base\_penalty} + 0.2 & \mathrm{if \ (agent\_window < min \ and \ agent\_action = 'Increase') \ or \ (agent\_window > max \ and \ agent\_action = 'Decrease')} \\
-\mathrm{base\_penalty} - 0.2 & \mathrm{if \ moving \ away \ from \ the \ range}
+\mathrm{base\_reward} \mathrel{+=} 0.15 & \mathrm{if \ in \ optimal \ window \ and \ (agent\_window > smoothed\_ideal \ and \ agent\_action = 'Decrease')} \\
+\mathrm{base\_reward} \mathrel{+=} 0.15 & \mathrm{if \ in \ 'optimal \ window' \ and \ (agent\_window < smoothed\_ideal \ and \ agent\_action = 'Increase')} \\
+\mathrm{base\_reward} += 0.075 & \mathrm{if \ in 'optimal \ window' \ and \ agent\_action = 'Nothing'} \\
+\mathrm{base\_reward} -= 0.15 & \mathrm{if \ in \ 'optimal \ window' \ and \ moving \ away \ from \ the \ 'smoothed \ ideal'} \\
+\mathrm{base\_penalty} \mathrel{+=} 0.2 & \mathrm{if \ not \ in \ 'optimal \ window' \ and \ (agent\_window < min \ and \ agent\_action = 'Increase')} \\
+\mathrm{base\_penalty} \mathrel{+=} 0.2 & \mathrm{if \ not \ in \ 'optimal \ window' \ and \ (agent\_window > max \ and \ agent\_action = 'Decrease')} \\
+\mathrm{base\_penalty} -= 0.2 & \mathrm{if \ not \ in \ 'optimal \ window' \ and \ moving \ away \ from \ the \ range}
 \end{cases}
 $$
 
